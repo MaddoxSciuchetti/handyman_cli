@@ -30,6 +30,9 @@ availability, and booking requirements.
 
 ![Owner interview in progress](images/Screenshot%202026-07-23%20at%2018.37.28.png)
 
+> **Live demo:** This is a real, working phone call—not a simulated flow. Enter
+> a real phone number and the AI interviewer will call it.
+
 ### 3. Review the business profile
 
 Review the combined website and interview data, then choose the business's CLI
@@ -45,6 +48,13 @@ services, and book it with structured commands.
 ![Published CLI and its available commands](images/Screenshot%202026-07-23%20at%2018.38.35.png)
 
 ![Using the published CLI in a terminal](images/Screenshot%202026-07-23%20at%2018.38.46.png)
+
+## Tech used
+
+- **Octen** searches and extracts service information from the business website.
+- **OpenAI** turns the extracted data into a structured business profile.
+- **Vapi** runs the AI phone interview with the business owner.
+- **Twilio** provides the phone number and telephony layer for the call.
 
 ## Setup
 
