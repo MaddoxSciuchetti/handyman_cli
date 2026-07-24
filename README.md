@@ -1,6 +1,50 @@
 # Handyman CLI
 
-Turn a handyman website and owner interview into a local command-line tool.
+## Problem
+
+Small service businesses, such as HVAC companies, cannot easily be discovered by
+AI agents. Their websites often do not provide enough structured information for
+agents to understand their services or book work on behalf of people.
+
+Handyman CLI lets every small HVAC business create and publish its own custom
+CLI. Other agents can discover the business, understand its services, and book
+it directly through the CLI.
+
+## How it works
+
+### 1. Analyze the business website
+
+Enter the business website. Handyman CLI searches it and extracts the services
+and service areas already listed online.
+
+![Enter the business website](images/Screenshot%202026-07-23%20at%2018.36.45.png)
+
+![Handyman CLI analyzing the website](images/Screenshot%202026-07-23%20at%2018.37.04.png)
+
+### 2. Complete a short phone interview
+
+The owner receives a call to fill in missing details such as pricing,
+availability, and booking requirements.
+
+![Enter a phone number for the owner interview](images/Screenshot%202026-07-23%20at%2018.37.22.png)
+
+![Owner interview in progress](images/Screenshot%202026-07-23%20at%2018.37.28.png)
+
+### 3. Review the business profile
+
+Review the combined website and interview data, then choose the business's CLI
+command.
+
+![Review the generated business profile](images/Screenshot%202026-07-23%20at%2018.38.28.png)
+
+### 4. Publish and use the CLI
+
+Publish the custom CLI so agents can discover the business, inspect its
+services, and book it with structured commands.
+
+![Published CLI and its available commands](images/Screenshot%202026-07-23%20at%2018.38.35.png)
+
+![Using the published CLI in a terminal](images/Screenshot%202026-07-23%20at%2018.38.46.png)
 
 ## Setup
 

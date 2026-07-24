@@ -570,6 +570,7 @@ async function handleWebhook(body) {
 
   if (message.type === "status-update" && call.status) {
     job.callStatus = call.status;
+    if (call.status === "ended") job.status = "processing";
     await saveJob(job);
     return;
   }
@@ -585,6 +586,49 @@ async function handleWebhook(body) {
   job.status = "profile_ready";
   job.transcript = message?.transcript || call?.transcript || null;
   await saveJob(job);
+}
+
+async function reconcileVapiCall(job) {
+  if (
+    !process.env.VAPI_API_KEY ||
+    !job.callId ||
+    job.mode === "demo" ||
+    !["calling", "processing"].includes(job.status)
+  ) {
+    return job;
+  }
+
+  const lastCheck = job.lastCallCheckAt
+    ? new Date(job.lastCallCheckAt).getTime()
+    : 0;
+  if (Date.now() - lastCheck < 3000) return job;
+
+  job.lastCallCheckAt = new Date().toISOString();
+  const response = await fetch(`https://api.vapi.ai/call/${job.callId}`, {
+    headers: { Authorization: `Bearer ${process.env.VAPI_API_KEY}` },
+  });
+  if (!response.ok) {
+    await saveJob(job);
+    return job;
+  }
+
+  const call = await response.json();
+  job.callStatus = call.status || job.callStatus;
+  if (call.status === "ended") {
+    const structured =
+      call?.analysis?.structuredData ||
+      Object.values(call?.artifact?.structuredOutputs || {})[0]?.result ||
+      null;
+    if (structured && Object.keys(structured).length) {
+      mergeInterview(job, structured);
+      job.status = "profile_ready";
+      job.transcript = call.transcript || job.transcript || null;
+    } else {
+      job.status = "processing";
+    }
+  }
+  await saveJob(job);
+  return job;
 }
 
 async function publishJob(job, requestedSlug) {
@@ -679,10 +723,11 @@ const server = createServer(async (request, response) => {
 
     const match = url.pathname.match(/^\/api\/jobs\/([^/]+)(?:\/(call|publish))?$/);
     if (match) {
-      const job = await getJob(match[1]);
+      let job = await getJob(match[1]);
       if (!job) return send(response, 404, { error: "Job not found." });
 
       if (request.method === "GET" && !match[2]) {
+        job = await reconcileVapiCall(job);
         return send(response, 200, job);
       }
       if (request.method === "POST" && match[2] === "call") {

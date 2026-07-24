@@ -67,6 +67,7 @@ type Job = {
     | "extracting"
     | "website_ready"
     | "calling"
+    | "processing"
     | "profile_ready"
     | "published"
     | "error";
@@ -86,6 +87,7 @@ type Stage =
   | "analysis"
   | "phone"
   | "calling"
+  | "processing"
   | "profile"
   | "publishing"
   | "published";
@@ -98,6 +100,7 @@ function stageFromJob(job: Job | null, pending: Stage): Stage {
   }
   if (job.status === "website_ready") return "phone";
   if (job.status === "calling") return "calling";
+  if (job.status === "processing") return "processing";
   if (job.status === "profile_ready") return "profile";
   if (job.status === "published") return "published";
   return pending;
@@ -108,6 +111,7 @@ const stepNumber: Record<Stage, number> = {
   analysis: 1,
   phone: 2,
   calling: 2,
+  processing: 2,
   profile: 3,
   publishing: 4,
   published: 4,
@@ -134,7 +138,10 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!job || !["analyzing", "extracting", "calling"].includes(job.status)) {
+    if (
+      !job ||
+      !["analyzing", "extracting", "calling", "processing"].includes(job.status)
+    ) {
       return;
     }
     const timer = window.setInterval(() => fetchJob(job.id), 1200);
@@ -146,6 +153,7 @@ export default function Home() {
     if (stage === "analysis") return job?.status === "extracting" ? 24 : 16;
     if (stage === "phone") return 42;
     if (stage === "calling") return 56;
+    if (stage === "processing") return 66;
     if (stage === "profile") return 75;
     if (stage === "publishing") return 90;
     return 100;
@@ -346,6 +354,19 @@ export default function Home() {
                 Interview in progress
               </h1>
               <Badge className="mt-8">Call connected</Badge>
+            </div>
+          )}
+
+          {stage === "processing" && (
+            <div
+              className="flex h-full flex-col items-center justify-center text-center"
+              aria-live="polite"
+            >
+              <LoaderCircle className="mb-8 size-9 animate-spin" strokeWidth={1.6} />
+              <h1 className="text-4xl font-semibold tracking-[-0.045em]">
+                Processing interview
+              </h1>
+              <Badge className="mt-8">Call ended</Badge>
             </div>
           )}
 
